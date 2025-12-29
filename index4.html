@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>聊天遊戲</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans', sans-serif;
+    background: #f5f5f5;
+  }
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100vh;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    border: 1px solid #ccc;
+    background: #fff;
+    position: relative;
+  }
+  .messages {
+    overflow-y: scroll;
+    padding: 10px;
+    flex: 1;
+  }
+  .message {
+    display: flex;
+    align-items: flex-end;
+    margin: 5px 0;
+    max-width: 80%;
+    word-wrap: break-word;
+  }
+  .message.user {
+    justify-content: flex-end;
+    align-self: flex-end;
+  }
+  .message.clearong {
+    justify-content: flex-start;
+    align-self: flex-start;
+  }
+  .message img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  .message.user span {
+    background: #a0e7e5;
+    padding: 8px 12px;
+    border-radius: 15px;
+  }
+  .message.clearong span {
+    background: #ffb3b3;
+    padding: 8px 12px;
+    border-radius: 15px;
+  }
+  .input-box {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+  }
+  .input-box input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+  .input-box button {
+    margin-left: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: none;
+    background: #ffb3b3;
+    color: white;
+    font-weight: bold;
+  }
+  .volume-control {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+  }
+  .volume-control input {
+    margin-right: 5px;
+  }
+  audio {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <audio id="bgm" loop>
+    <source src="https://www.youtube.com/watch?v=IiyS-0QdQcE&list=RDIiyS-0QdQcE&start_radio=1" type="audio/mpeg">
+  </audio>
+
+  <div class="volume-control">
+    <input type="range" min="0" max="1" step="0.01" value="0.3" id="volumeSlider">
+    <span id="volumeDisplay">0.3</span>
+  </div>
+  
+  <div class="messages" id="messages"></div>
+  
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="打字給清隆...">
+    <button onclick="sendMessage()">送出</button>
+  </div>
+</div>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('userInput');
+  const bgm = document.getElementById('bgm');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const volumeDisplay = document.getElementById('volumeDisplay');
+  const clearongImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVTnmFBTGraWb1A4my88qafcqwcPZm7ZnWLg&s";
+
+  bgm.volume = volumeSlider.value;
+  bgm.play();
+
+  volumeSlider.addEventListener('input', () => {
+    bgm.volume = volumeSlider.value;
+    volumeDisplay.textContent = volumeSlider.value;
+  });
+
+  const replies = [
+    "嗨，我是清隆。",
+    "今天心情不錯呢。",
+    "你剛剛做了什麼？",
+    "嗯，聽起來很有趣。",
+    "你想聊什麼？",
+    "我喜歡看動畫，也喜歡聊天。",
+    "說說你的煩惱吧，我會聽的。",
+    "呵呵，我也是這樣想的。",
+    "你覺得這個世界怎麼樣？",
+    "我喜歡慢慢了解你。",
+    "時間過得真快呢。",
+    "你的興趣是什麼？",
+    "你喜歡甜食嗎？",
+    "聊天讓我很開心。",
+    "嗯，真有趣的想法！",
+    "你最近有什麼開心的事嗎？",
+    "你喜歡哪種音樂？",
+    "我會慢慢記住你的喜好。",
+    "這樣啊，我懂了。",
+    "說得好！",
+    // 可以增加到 200+ 條
+  ];
+
+  let messageCount = 0;
+
+  function sendMessage() {
+    const text = inputEl.value.trim();
+    if (text === '') return;
+    addMessage(text, 'user');
+    inputEl.value = '';
+
+    setTimeout(() => {
+      const replyIndex = messageCount % replies.length;
+      addMessage(replies[replyIndex], 'clearong');
+      messageCount++;
+    }, 800);
+  }
+
+  function addMessage(text, type) {
+    const msgEl = document.createElement('div');
+    msgEl.className = 'message ' + type;
+    if(type === 'clearong'){
+      msgEl.innerHTML = `<img src="${clearongImage}" alt="清隆"><span>${text}</span>`;
+    } else {
+      msgEl.innerHTML = `<span>${text}</span>`;
+    }
+    messagesEl.appendChild(msgEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // 支援按 Enter 送出
+  inputEl.addEventListener('keypress', function(e){
+    if(e.key === 'Enter'){
+      sendMessage();
+    }
+  });
+</script>
+
+</body>
+</html>
